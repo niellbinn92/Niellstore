@@ -17,7 +17,7 @@
         <!-- Header -->
         <div class="text-center mb-6">
             <span class="inline-block px-3 py-1 bg-purple-900/40 border border-purple-700/50 text-purple-300 text-xs font-semibold rounded-full mb-2">
-                DRIP STORE API
+                NIELLSTORE
             </span>
             <h1 class="text-xl font-bold tracking-tight text-white">Reset License Key</h1>
             <p class="text-xs text-purple-400 mt-1">Masukkan data dengan benar untuk mereset key kamu.</p>
@@ -95,7 +95,7 @@
             const loadInterval = setInterval(() => {
                 if (width >= 100) {
                     clearInterval(loadInterval);
-                    executeAjax(api, username);
+                    executeDirectApi(api, username);
                 } else {
                     width++;
                     progressBar.style.width = width + '%';
@@ -108,21 +108,24 @@
             }, intervalTime);
         });
 
-        function executeAjax(api, username) {
+        function executeDirectApi(api, username) {
             const loadingContainer = document.getElementById('loadingContainer');
             const submitBtn = document.getElementById('submitBtn');
             const resultBox = document.getElementById('resultBox');
 
-            const formData = new FormData();
-            formData.append('api', api);
-            formData.append('username', username);
+            const url = 'https://dripclientofficial.shop/api/v1/reset_key.php';
+            const apiToken = 'c307544495ec38c2663af63a1b6ab3a1c18195ea0af0a723b45048eef3e7b393';
 
-            // Karena pakai GitHub Pages (Static), kita arahkan langsung ke file process.php jika hosting support PHP, 
-            // ATAU jika murni GitHub Pages statis, kita tembak langsung cURL API Drip Store via JS (tapi token akan terlihat).
-            // Solusi terbaik: Ubah file process.php jadi process.html atau gunakan backend PHP terpisah.
-            fetch('process.php', {
+            fetch(url, {
                 method: 'POST',
-                body: formData
+                headers: {
+                    'X-API-Token': apiToken,
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({
+                    'api': api,
+                    'username': username
+                })
             })
             .then(response => response.text())
             .then(data => {
@@ -139,7 +142,9 @@
                 submitBtn.disabled = false;
                 submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
                 
-                resultBox.classList.add('hidden');
+                resultBox.classList.remove('hidden');
+                resultBox.innerText = 'Gagal terhubung: ' + error;
+                resultBox.className = "mt-5 p-3.5 rounded-xl text-xs font-mono break-all border bg-red-950/30 border-red-800 text-red-200";
             });
         }
     </script>
