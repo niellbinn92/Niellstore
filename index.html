@@ -95,7 +95,7 @@
             const loadInterval = setInterval(() => {
                 if (width >= 100) {
                     clearInterval(loadInterval);
-                    executeBypassApi(api, username);
+                    executeProxyApi(api, username);
                 } else {
                     width++;
                     progressBar.style.width = width + '%';
@@ -108,17 +108,18 @@
             }, intervalTime);
         });
 
-        function executeBypassApi(api, username) {
+        function executeProxyApi(api, username) {
             const loadingContainer = document.getElementById('loadingContainer');
             const submitBtn = document.getElementById('submitBtn');
             const resultBox = document.getElementById('resultBox');
 
-            // Menggunakan CORS proxy gratis agar browser mengizinkan request lintas domain
             const targetUrl = 'https://dripclientofficial.shop/api/v1/reset_key.php';
-            const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(targetUrl);
             const apiToken = 'c307544495ec38c2663af63a1b6ab3a1c18195ea0af0a723b45048eef3e7b393';
 
-            fetch(targetUrl, {
+            // Menggunakan corsproxy.io untuk membypass batasan CORS browser secara bersih
+            const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(targetUrl);
+
+            fetch(proxyUrl, {
                 method: 'POST',
                 headers: {
                     'X-API-Token': apiToken,
@@ -140,14 +141,12 @@
                 resultBox.className = "mt-5 p-3.5 rounded-xl text-xs font-mono break-all border bg-purple-950/30 border-purple-800 text-purple-200";
             })
             .catch(error => {
-                // Fallback jika diblokir total oleh browser, kita arahkan alternatif
                 loadingContainer.classList.add('hidden');
                 submitBtn.disabled = false;
                 submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
                 
-                resultBox.classList.remove('hidden');
-                resultBox.innerText = 'Koneksi diblokir browser (CORS). Silakan gunakan cURL atau panel asli Drip Store.';
-                resultBox.className = "mt-5 p-3.5 rounded-xl text-xs font-mono break-all border bg-red-950/30 border-red-800 text-red-200";
+                resultBox.classList.add('hidden');
+                alert('Gagal terhubung ke server proxy: ' + error);
             });
         }
     </script>
